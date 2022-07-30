@@ -13,25 +13,33 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.satishlabs.bookstoreweb.config.BookStoreWebConfig;
 import com.satishlabs.bookstoreweb.dto.Book;
 import com.satishlabs.bookstoreweb.dto.BookInfo;
-import com.satishlabs.bookstoreweb.dto.Order;
-import com.satishlabs.bookstoreweb.dto.OrderInfo;
-import com.satishlabs.bookstoreweb.dto.OrderItem;
 import com.satishlabs.bookstoreweb.dto.UserRating;
 import com.satishlabs.bookstoreweb.service.BookStoreService;
+import com.satishlabs.rabbitmq.Order;
+import com.satishlabs.rabbitmq.OrderInfo;
+import com.satishlabs.rabbitmq.OrderItem;
+import com.satishlabs.rabbitmq.UserRatingInfo;
 
 /**
  * @author Satish
  * 
- * Jul 18, 2022
+ *         Jul 18, 2022
  */
 
 @Service
 public class BookStoreServiceImpl implements BookStoreService {
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+
 	static Logger logInfo = LoggerFactory.getLogger(BookStoreServiceImpl.class);
 
 	Map<Integer, Book> booksMap = new LinkedHashMap<>();
@@ -102,7 +110,8 @@ public class BookStoreServiceImpl implements BookStoreService {
 
 	@Override
 	public void placeOrder(Map<Integer, Book> mycartMap) {
-		logInfo.info("----BookStoreServiceImpl --- placeOrder()----");
+		logInfo.info("----2. BookStoreServiceImpl --- placeOrder()----");
+
 		List<OrderItem> itemList = new ArrayList<>();
 		double totalPrice = 0.0;
 		int totalQuantity = 0;
@@ -125,21 +134,30 @@ public class BookStoreServiceImpl implements BookStoreService {
 		OrderInfo orderInfo = new OrderInfo();
 		orderInfo.setOrder(order);
 		orderInfo.setItemsList(itemList);
-		// Invoke PlaceOrder MS
-		String orderEndpoint = "http://localhost:7000/placeorder";
-		RestTemplate orderRest = new RestTemplate();
-		orderRest.put(orderEndpoint, orderInfo);
-		System.out.println("Order Placed");
+
+		/*
+		 * // Invoke PlaceOrder MS String orderEndpoint =
+		 * "http://localhost:7000/placeorder"; RestTemplate orderRest = new
+		 * RestTemplate(); orderRest.put(orderEndpoint, orderInfo);
+		 * System.out.println("Order Placed");
+		 */
+
+		// Send Order Message to RabbitMQ
+		rabbitTemplate.convertAndSend(BookStoreWebConfig.ORDER_QUEUE, orderInfo);
+		System.out.println("Order Placed....");
 
 	}
 
-	@Override
 	public void addUserRating(UserRating userRating) {
-		logInfo.info("----BookStoreServiceImpl --- addUserRating()----");
+		logInfo.info("----2. BookStoreServiceImpl --- addUserRating()----");
 		// Invoke UserRating MS
-		String ratingEndpoint = "http://localhost:6500/addusrrating";
-		RestTemplate ratingRest = new RestTemplate();
-		ratingRest.put(ratingEndpoint, userRating);
+		/*
+		 * String ratingEndpoint = "http://localhost:6500/addusrrating"; RestTemplate
+		 * ratingRest = new RestTemplate(); ratingRest.put(ratingEndpoint, userRating);
+		 */
+		UserRatingInfo userRatingInfo = new UserRatingInfo(userRating.getUserId(), userRating.getBookId(),
+				userRating.getRating(), userRating.getReview());
+		rabbitTemplate.convertAndSend(BookStoreWebConfig.USER_RATING_QUEUE, userRatingInfo);
 		System.out.println("Rating Added...");
 	}
 

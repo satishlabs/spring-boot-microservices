@@ -24,21 +24,39 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SpringBootApplication
 public class UserRatingConfig implements WebMvcConfigurer {
 
-	public static final String RATINGS_QUEUE = "MyRatings-Queue";
-	public static final String RATINGS_EXCHNAGE = "MyRatings-Exchange";
+	public static final String BOOK_RATING_QUEUE = "MyBookRating-Queue";
+	public static final String BOOK_RATING_EXCHNAGE = "MyBookRating-Exchange";
 
-	@Bean(name = "myRatingsQueue")
-	Queue createRatingsQueue() {
-		return QueueBuilder.durable(RATINGS_QUEUE).build();
+	public static final String USER_RATING_QUEUE = "MyUserRating-Queue";
+	public static final String USER_RATING_EXCHNAGE = "MyUserRating-Exchange";
+
+	@Bean(name = "myBookRatingQueue")
+	Queue createBookRatingQueue() {
+		return QueueBuilder.durable(BOOK_RATING_QUEUE).build();
 	}
 
-	@Bean(name = "myRatingsExchange")
-	Exchange createRatingsExchange() {
-		return ExchangeBuilder.topicExchange(RATINGS_EXCHNAGE).build();
+	@Bean(name = "myBookRatingExchange")
+	Exchange createBookRatingExchange() {
+		return ExchangeBuilder.topicExchange(BOOK_RATING_EXCHNAGE).build();
 	}
 
 	@Bean
-	Binding ratingBinding(Queue myRatingQueue, TopicExchange myRatingExchange) {
-		return BindingBuilder.bind(myRatingQueue).to(myRatingExchange).with(RATINGS_QUEUE);
+	Binding bookRatingBinding(Queue myBookRatingQueue, TopicExchange myBookRatingExchange) {
+		return BindingBuilder.bind(myBookRatingQueue).to(myBookRatingExchange).with(BOOK_RATING_QUEUE);
+	}
+
+	@Bean(name = "myUserRatingQueue")
+	Queue createUserRatingQueue() {
+		return QueueBuilder.durable(USER_RATING_QUEUE).build();
+	}
+
+	@Bean(name = "myUserRatingExchange")
+	Exchange createUserRatingExchange() {
+		return ExchangeBuilder.topicExchange(USER_RATING_EXCHNAGE).build();
+	}
+
+	@Bean
+	Binding userRatingBinding(Queue myUserRatingQueue, TopicExchange myUserRatingExchange) {
+		return BindingBuilder.bind(myUserRatingQueue).to(myUserRatingExchange).with(USER_RATING_QUEUE);
 	}
 }

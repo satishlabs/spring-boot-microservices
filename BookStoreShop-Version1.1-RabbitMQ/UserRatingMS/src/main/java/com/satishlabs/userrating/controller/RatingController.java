@@ -33,11 +33,13 @@ public class RatingController {
 	@Autowired
 	private RatingService ratingService;
 	
+	/*
 	@PostMapping("/addusrrating")
 	public void addUserRating(@RequestBody UserRating userRating) {
 		logInfo.info("----RatingController ---addUserRating()----");
 		ratingService.addUserRating(userRating);
 	}
+	*/
 	
 	@GetMapping("/userrating/{userId}")
 	public List<UserRating> getUserRatingByUserId(@PathVariable String userId){

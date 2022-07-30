@@ -9,11 +9,13 @@ import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.satishlabs.rabbitmq.BookRatingInfo;
+import com.satishlabs.rabbitmq.UserRatingInfo;
 import com.satishlabs.userrating.config.UserRatingConfig;
 import com.satishlabs.userrating.dao.BookRatingDAO;
 import com.satishlabs.userrating.dao.UserRatingDAO;
@@ -39,10 +41,12 @@ public class RatingServiceImpl implements RatingService {
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
 	
-	@Override
-	public void addUserRating(UserRating userRating) {
-		logInfo.info("---- RatingServiceImpl --- addUserRating() ----");
+	@RabbitListener(queues = UserRatingConfig.USER_RATING_QUEUE)
+	public void addUserRating(UserRatingInfo userRatingInfo) {
+		logInfo.info("---- 3. RatingServiceImpl --- addUserRating() ----");
 		// 1. add the UserRating
+		
+		UserRating userRating = new UserRating(userRatingInfo.getBookId(), userRatingInfo.getUserId(), userRatingInfo.getRating(), userRatingInfo.getReview());
 		userRatingDAO.save(userRating);
 
 		// 2. Calculate the Avg Rating for BookId
@@ -73,7 +77,7 @@ public class RatingServiceImpl implements RatingService {
 		bookRatingInfo.setBookId(bookRating.getBookId());
 		bookRatingInfo.setAvgRating(bookRating.getAvgRating());
 		bookRatingInfo.setNumberOfSearches(bookRating.getNumberOfSearches());
-		rabbitTemplate.convertAndSend(UserRatingConfig.RATINGS_QUEUE, bookRatingInfo);
+		rabbitTemplate.convertAndSend(UserRatingConfig.BOOK_RATING_QUEUE, bookRatingInfo);
 
 	}
 

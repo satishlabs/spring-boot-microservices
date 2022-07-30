@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.satishlabs.placeorder.entity.Order;
+import com.satishlabs.placeorder.entity.MyOrder;
 
-public interface OrderDAO extends JpaRepository<Order, Integer>{
-	public List<Order> getOrderByUserId(String userId);
+public interface OrderDAO extends JpaRepository<MyOrder, Integer>{
+	public List<MyOrder> getOrderByUserId(String userId);
 }

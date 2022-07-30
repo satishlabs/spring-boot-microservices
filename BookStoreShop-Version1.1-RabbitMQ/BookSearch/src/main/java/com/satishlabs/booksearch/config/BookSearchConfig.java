@@ -9,28 +9,30 @@ import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-public class BookSearchConfig {
-	public static final String RATINGS_QUEUE="MyRatings-Queue";
-	public static final String RATINGS_EXCHNAGE = "MyRatings-Exchange";
+public class BookSearchConfig implements WebMvcConfigurer{
+	
+	public static final String BOOK_RATING_QUEUE = "MyBookRating-Queue";
+	public static final String BOOK_RATING_EXCHNAGE = "MyBookRating-Exchange";
 	
 	public static final String INVENTORY_QUEUE="MyInventory-Queue";
 	public static final String INVENTORY_EXCHANGE="MyInventory-Exchange";
 	
-	@Bean(name = "myRatingsQueue")
-	Queue createRatingsQueue() {
-		return QueueBuilder.durable(RATINGS_QUEUE).build();
+	@Bean(name = "myBookRatingQueue")
+	Queue createBookRatingQueue() {
+		return QueueBuilder.durable(BOOK_RATING_QUEUE).build();
 	}
-	
-	@Bean(name = "myRatingsExchange")
-	Exchange createRatingsExchange() {
-		return ExchangeBuilder.topicExchange(RATINGS_EXCHNAGE).build();
+
+	@Bean(name = "myBookRatingExchange")
+	Exchange createBookRatingExchange() {
+		return ExchangeBuilder.topicExchange(BOOK_RATING_EXCHNAGE).build();
 	}
-	
+
 	@Bean
-	Binding ratingBinding(Queue myRatingQueue,TopicExchange myRatingExchange) {
-		return BindingBuilder.bind(myRatingQueue).to(myRatingExchange).with(RATINGS_QUEUE);
+	Binding bookRatingBinding(Queue myBookRatingQueue, TopicExchange myBookRatingExchange) {
+		return BindingBuilder.bind(myBookRatingQueue).to(myBookRatingExchange).with(BOOK_RATING_QUEUE);
 	}
 	
 	//Inventory Details

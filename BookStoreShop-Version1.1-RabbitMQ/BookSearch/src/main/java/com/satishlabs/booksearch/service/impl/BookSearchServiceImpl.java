@@ -91,9 +91,9 @@ public class BookSearchServiceImpl implements BookSearchService {
 
 	// All Bean method is called by Spring container
 
-	@RabbitListener(queues = BookSearchConfig.RATINGS_QUEUE)
+	@RabbitListener(queues = BookSearchConfig.BOOK_RATING_QUEUE)
 	public void updateBookRating(BookRatingInfo bookRatingInfo) {
-		logInfo.info("----BookSearchServiceImpl --- updateBookRating()--- ");
+		logInfo.info("----4. BookSearchServiceImpl --- updateBookRating()--- ");
 
 		BookRating bookRating = new BookRating();
 		bookRating.setBookId(bookRatingInfo.getBookId());
@@ -105,7 +105,7 @@ public class BookSearchServiceImpl implements BookSearchService {
 
 	@RabbitListener(queues = BookSearchConfig.INVENTORY_QUEUE)
 	public void updateBookInventory(BookInventoryInfo bookInventoryInfo) {
-		logInfo.info("----BookSearchServiceImpl --- updateBookInventory()--- ");
+		logInfo.info("----4. BookSearchServiceImpl --- updateBookInventory()--- ");
 
 		BookInventory bookInventory = new BookInventory();
 		bookInventory.setBookId(bookInventoryInfo.getBookId());

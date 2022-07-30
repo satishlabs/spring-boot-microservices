@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "myorderitems",schema = "ordersdb")
-public class OrderItem {
+public class MyOrderItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "orderItemId_generator")
 	@SequenceGenerator(name = "orderItemId_generator",sequenceName = "myorderItemId_gen",initialValue = 3,allocationSize = 1)
@@ -29,9 +29,16 @@ public class OrderItem {
 	@Column(name = "cost")
 	private double cost;
 	
-	public OrderItem() {}
+	public MyOrderItem() {}
 	
-	public OrderItem(Integer orderItemId, Integer orderId, Integer bookId, int qty, double cost) {
+	public MyOrderItem(Integer orderId, Integer bookId, int qty, double cost) {
+		this.orderId = orderId;
+		this.bookId = bookId;
+		this.qty = qty;
+		this.cost = cost;
+	}
+	
+	public MyOrderItem(Integer orderItemId, Integer orderId, Integer bookId, int qty, double cost) {
 		super();
 		this.orderItemId = orderItemId;
 		this.orderId = orderId;

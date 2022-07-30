@@ -1,18 +1,23 @@
 /**
  * 
  */
-package com.satishlabs.placeorder.dto;
+package com.satishlabs.rabbitmq;
 
+import java.io.Serializable;
 import java.util.List;
-
-import com.satishlabs.placeorder.entity.Order;
-import com.satishlabs.placeorder.entity.OrderItem;
 
 /**
  * @author Satish
+
  * Jul 18, 2022
  */
-public class OrderInfo {
+public class OrderInfo implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private Order order;
 	private List<OrderItem> itemsList;
 	

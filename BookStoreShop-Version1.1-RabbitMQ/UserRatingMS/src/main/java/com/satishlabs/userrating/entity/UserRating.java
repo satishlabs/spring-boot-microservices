@@ -22,7 +22,7 @@ import javax.persistence.Table;
 public class UserRating {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "ratingId_generator")
-	@SequenceGenerator(name = "ratingId_generator",sequenceName = "myratingId_gen",initialValue = 10000,allocationSize = 1)
+	@SequenceGenerator(name = "ratingId_generator",sequenceName = "myratingId_gen",initialValue = 6,allocationSize = 1)
 	@Column(name = "rating_id")
 	private Integer ratingId;
 	

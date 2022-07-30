@@ -1,14 +1,22 @@
 /**
  * 
  */
-package com.satishlabs.bookstoreweb.dto;
+package com.satishlabs.rabbitmq;
+
+import java.io.Serializable;
 
 /**
  * @author Satish
 
  * Jul 18, 2022
  */
-public class Order {
+public class Order implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private Integer orderId;
 	private String orderDate;
 	private String userId;

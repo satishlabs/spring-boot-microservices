@@ -8,7 +8,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.satishlabs.boosearch</groupId>
-	<artifactId>BookSearch</artifactId>
+	<artifactId>BookSearchMS</artifactId>
 	<version>1.1</version>
 	<name>BookSearchMS</name>
 	<description>This is a BookSearchMS microservice application</description>
