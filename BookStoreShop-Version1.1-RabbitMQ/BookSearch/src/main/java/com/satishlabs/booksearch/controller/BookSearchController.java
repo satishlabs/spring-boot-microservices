@@ -42,6 +42,9 @@ public class BookSearchController {
 		return bookSearchService.getBookInfo(bookId);
 	}
 	
+	/*
+	 * These are Async call, its required with RabbitMQ, So No need to be here
+	 * 
 	@PutMapping("/updateBookRating")
 	public void updateBookRating(@RequestBody BookRating bookRating) {
 		logInfo.info("---- BookSearchController --- updateBookRating() ----");
@@ -53,4 +56,5 @@ public class BookSearchController {
 		logInfo.info("---- BookSearchController --- updateBookInventory() ----");
 		bookSearchService.updateBookInventory(bookInventory);
 	}
+	*/
 }
