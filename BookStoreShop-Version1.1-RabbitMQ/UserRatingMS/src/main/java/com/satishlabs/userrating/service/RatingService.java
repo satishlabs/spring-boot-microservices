@@ -14,7 +14,7 @@ import com.satishlabs.userrating.entity.UserRating;
  * Jul 18, 2022
  */
 public interface RatingService {
-	//public void addUserRating(UserRating userRating);
+	public void addUserRating(UserRating userRating);
 	public List<UserRating> getUserRatingByUserId(String userId);
 	public void updateBookRating(BookRating bookRating);
 	public BookRating getBookRatingByBookId(Integer bookId);

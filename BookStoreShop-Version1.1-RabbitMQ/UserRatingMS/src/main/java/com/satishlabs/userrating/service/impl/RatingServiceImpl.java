@@ -38,7 +38,8 @@ public class RatingServiceImpl implements RatingService {
 
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
-
+	
+	@Override
 	public void addUserRating(UserRating userRating) {
 		logInfo.info("---- RatingServiceImpl --- addUserRating() ----");
 		// 1. add the UserRating
