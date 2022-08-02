@@ -22,6 +22,10 @@ import com.satishlabs.bookstoreweb.config.BookStoreWebConfig;
 import com.satishlabs.bookstoreweb.dto.Book;
 import com.satishlabs.bookstoreweb.dto.BookInfo;
 import com.satishlabs.bookstoreweb.dto.UserRating;
+import com.satishlabs.bookstoreweb.feign.BookPriceProxy;
+import com.satishlabs.bookstoreweb.feign.BookSearchProxy;
+import com.satishlabs.bookstoreweb.feign.PlaceOrderProxy;
+import com.satishlabs.bookstoreweb.feign.UserRatingProxy;
 import com.satishlabs.bookstoreweb.service.BookStoreService;
 import com.satishlabs.rabbitmq.Order;
 import com.satishlabs.rabbitmq.OrderInfo;
@@ -43,6 +47,19 @@ public class BookStoreServiceImpl implements BookStoreService {
 	static Logger logInfo = LoggerFactory.getLogger(BookStoreServiceImpl.class);
 
 	Map<Integer, Book> booksMap = new LinkedHashMap<>();
+
+	// Inject all proxy's
+	@Autowired
+	private BookPriceProxy bookPriceProxy;
+
+	@Autowired
+	private BookSearchProxy bookSearchProxy;
+
+	@Autowired
+	private PlaceOrderProxy placeOrderProxy;
+
+	@Autowired
+	private UserRatingProxy userRatingProxy;
 
 	@Override
 	public List<String> getAuthorsList() {
@@ -77,16 +94,21 @@ public class BookStoreServiceImpl implements BookStoreService {
 			category = "All Categories";
 		}
 		// Invoke BookSearchMS
-		RestTemplate bookSearchRest = new RestTemplate();
-		String endpoint = "http://localhost:8000/mybooks/" + author + "/" + category;
-		List<Map> list = bookSearchRest.getForObject(endpoint, List.class);
-		List<Book> bookList = new ArrayList<>();
-		for (Map mymap : list) {
-			Book mybook = convertMapToBook(mymap);
-			bookList.add(mybook);
+		/*
+		 * RestTemplate bookSearchRest = new RestTemplate(); String endpoint =
+		 * "http://localhost:8000/mybooks/" + author + "/" + category; List<Map> list =
+		 * bookSearchRest.getForObject(endpoint, List.class); List<Book> bookList = new
+		 * ArrayList<>(); for (Map mymap : list) { Book mybook =
+		 * convertMapToBook(mymap); bookList.add(mybook);
+		 * booksMap.put(mybook.getBookId(), mybook); }
+		 */
+
+		// Invoke BookSearchMS with Feign proxy
+		List<Book> booksList = bookSearchProxy.getBooksByAuthorAndCategory(author, category);
+		for(Book mybook:booksList) {
 			booksMap.put(mybook.getBookId(), mybook);
 		}
-		return bookList;
+		return booksList;
 	}
 
 	@Override
@@ -101,9 +123,14 @@ public class BookStoreServiceImpl implements BookStoreService {
 	@Override
 	public BookInfo getBookInfoByBookId(Integer bookId) {
 		logInfo.info("----BookStoreServiceImpl --- getBookInfoByBookId()----");
-		RestTemplate bookSearchRest = new RestTemplate();
-		String endpoint = "http://localhost:8000/mybook/" + bookId;
-		BookInfo bookInfo = bookSearchRest.getForObject(endpoint, BookInfo.class);
+		/*
+		 * RestTemplate bookSearchRest = new RestTemplate(); String endpoint =
+		 * "http://localhost:8000/mybook/" + bookId; BookInfo bookInfo =
+		 * bookSearchRest.getForObject(endpoint, BookInfo.class);
+		 */
+
+		// Invoke BookSearchMS with Feign client
+		BookInfo bookInfo = bookSearchProxy.getBookById(bookId);
 		return bookInfo;
 
 	}
@@ -117,10 +144,17 @@ public class BookStoreServiceImpl implements BookStoreService {
 		int totalQuantity = 0;
 		for (Book mybook : mycartMap.values()) {
 			Integer bookId = mybook.getBookId();
-			// Invoke BookPrice Controller
-			RestTemplate bookPriceRest = new RestTemplate();
-			String priceEndpoint = "http://localhost:9000/offerprice/" + bookId;
-			double offerPrice = bookPriceRest.getForObject(priceEndpoint, Double.class);
+
+			/*
+			 * // Invoke BookPrice Controller RestTemplate bookPriceRest = new
+			 * RestTemplate(); String priceEndpoint = "http://localhost:9000/offerprice/" +
+			 * bookId; double offerPrice = bookPriceRest.getForObject(priceEndpoint,
+			 * Double.class);
+			 * 
+			 */
+			// Invoke BookPriceMS with Feign client
+			double offerPrice = bookPriceProxy.getOfferPrice(bookId);
+
 			OrderItem item = new OrderItem(0, bookId, 1, offerPrice);
 			itemList.add(item);
 			totalPrice = totalPrice + offerPrice;
@@ -153,36 +187,35 @@ public class BookStoreServiceImpl implements BookStoreService {
 	@Override
 	public List<UserRating> getMyRatings(String userId) {
 		logInfo.info("----BookStoreServiceImpl --- getMyRatings()----");
-		List<UserRating> ratingsList = new ArrayList<>();
-		String ratingEndpoint = "http://localhost:6500/userrating/" + userId;
-		RestTemplate ratingRest = new RestTemplate();
-		List<Map> mymap = ratingRest.getForObject(ratingEndpoint, List.class);
-		for (Map map : mymap) {
-			UserRating urtaing = convertMapToUserRating(map);
-			ratingsList.add(urtaing);
-			System.out.println(map);
-		}
+
+		// Invoke UserRatingMS with Feign client
+		List<UserRating> ratingsList = userRatingProxy.getUserRatingByUserId(userId);
+
+		/*
+		 * String ratingEndpoint = "http://localhost:6500/userrating/" + userId;
+		 * RestTemplate ratingRest = new RestTemplate(); List<Map> mymap =
+		 * ratingRest.getForObject(ratingEndpoint, List.class); for (Map map : mymap) {
+		 * UserRating urtaing = convertMapToUserRating(map); ratingsList.add(urtaing);
+		 * System.out.println(map); }
+		 */
+
 		return ratingsList;
 	}
 
-	private UserRating convertMapToUserRating(Map map) {
-		UserRating rating = new UserRating();
-		rating.setRatingId(new Integer(map.get("ratingId").toString()));
-		rating.setUserId(map.get("userId").toString());
-		rating.setBookId(new Integer(map.get("bookId").toString()));
-		rating.setRating(new Double(map.get("rating").toString()));
-		rating.setReview(map.get("review").toString());
-		return rating;
-	}
-
-	private Book convertMapToBook(Map map) {
-		Book mybook = new Book();
-		mybook.setBookId(Integer.parseInt(map.get("bookId").toString()));
-		mybook.setBookName((map.get("bookName").toString()));
-		mybook.setAuthor((map.get("author").toString()));
-		mybook.setPublications(map.get("publications").toString());
-		mybook.setCategory(map.get("category").toString());
-		return mybook;
-	}
-
+	/*
+	 * private UserRating convertMapToUserRating(Map map) { UserRating rating = new
+	 * UserRating(); rating.setRatingId(new
+	 * Integer(map.get("ratingId").toString()));
+	 * rating.setUserId(map.get("userId").toString()); rating.setBookId(new
+	 * Integer(map.get("bookId").toString())); rating.setRating(new
+	 * Double(map.get("rating").toString()));
+	 * rating.setReview(map.get("review").toString()); return rating; }
+	 * 
+	 * private Book convertMapToBook(Map map) { Book mybook = new Book();
+	 * mybook.setBookId(Integer.parseInt(map.get("bookId").toString()));
+	 * mybook.setBookName((map.get("bookName").toString()));
+	 * mybook.setAuthor((map.get("author").toString()));
+	 * mybook.setPublications(map.get("publications").toString());
+	 * mybook.setCategory(map.get("category").toString()); return mybook; }
+	 */
 }
