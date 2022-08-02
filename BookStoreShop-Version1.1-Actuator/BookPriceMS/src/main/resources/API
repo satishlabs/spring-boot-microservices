@@ -1,0 +1,11 @@
+Get Mapping:
+http://localhost:9000/bookprice/103
+http://localhost:9000/offerprice/103
+
+
+Actuator:
+http://localhost:9000/actuator
+http://localhost:8000/actuator
+http://localhost:7000/actuator
+http://localhost:6500/actuator
+http://localhost:5000/actuator
