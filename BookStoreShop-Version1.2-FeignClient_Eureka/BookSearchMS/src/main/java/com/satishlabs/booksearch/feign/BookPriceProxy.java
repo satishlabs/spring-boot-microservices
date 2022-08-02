@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.satishlabs.booksearch.dto.BookPriceInfo;
 
-@FeignClient(value = "BookPriceMS",url = "http://localhost:9000")
+//@FeignClient(value = "BookPriceMS",url = "http://localhost:9000")
+
+@FeignClient(name = "BOOKPRICEMS")
 public interface BookPriceProxy {
 	@GetMapping("/bookprice/{bookId}")
 	public BookPriceInfo getBookPrice(@PathVariable Integer bookId);
