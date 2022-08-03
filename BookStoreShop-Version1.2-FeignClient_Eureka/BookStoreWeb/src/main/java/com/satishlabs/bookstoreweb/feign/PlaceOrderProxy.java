@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.satishlabs.rabbitmq.Order;
 
 
-@FeignClient(value = "PlaceOrderMS",url = "http://localhost:7000")
+//@FeignClient(value = "PlaceOrderMS",url = "http://localhost:7000")
+@FeignClient(name = "PlaceOrderMS")
 public interface PlaceOrderProxy {
 	@GetMapping("/myorders/{userId}")
 	public List<Order> getOrdersByUserId(@PathVariable String userId);

@@ -12,7 +12,8 @@ import com.satishlabs.bookstoreweb.dto.UserRating;
 
 
 
-@FeignClient(value = "UserRatingMS",url = "http://localhost:6500")
+//@FeignClient(value = "UserRatingMS",url = "http://localhost:6500")
+@FeignClient(name = "UserRatingMS")
 public interface UserRatingProxy {
 	
 	@GetMapping("/userrating/{userId}")

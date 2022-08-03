@@ -10,7 +10,8 @@ import com.satishlabs.bookstoreweb.dto.Book;
 import com.satishlabs.bookstoreweb.dto.BookInfo;
 
 
-@FeignClient(value = "BookSearchMS",url = "http://localhost:8000")
+//@FeignClient(value = "BookSearchMS",url = "http://localhost:8000")
+@FeignClient(name = "BookSearchMS")
 public interface BookSearchProxy {
 	@GetMapping("/mybooks/{author}/{category}")
 	public List<Book> getBooksByAuthorAndCategory(@PathVariable String author, @PathVariable String category);

@@ -8,7 +8,8 @@ import com.satishlabs.bookstoreweb.dto.BookPriceInfo;
 
 
 
-@FeignClient(value = "BookPriceMS",url = "http://localhost:9000")
+//@FeignClient(value = "BookPriceMS",url = "http://localhost:9000")
+@FeignClient(name = "BookPriceMS")
 public interface BookPriceProxy {
 	@GetMapping("/bookprice/{bookId}")
 	public BookPriceInfo getBookPrice(@PathVariable Integer bookId);
