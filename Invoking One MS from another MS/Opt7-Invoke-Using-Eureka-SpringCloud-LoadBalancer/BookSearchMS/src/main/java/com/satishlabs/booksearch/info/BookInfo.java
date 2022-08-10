@@ -7,7 +7,6 @@ public class BookInfo {
 	private String category;
 	private String publications;
 	
-	//Get this from bookprice ms
 	private double price;
 	private double offer;
 	private String serverPort;
